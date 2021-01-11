@@ -1,0 +1,40 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import math
+
+data = pd.read_csv('https://raw.githubusercontent.com/WidhyaOrg/datasets/master/covid19.csv')
+print(data)
+
+total_confirmed = data["ConfirmedIndianNational"] + data["ConfirmedForeignNational"]
+data["TotalConfirmed"] = total_confirmed
+print(data)
+
+data2 = data.set_index(['Date','State/UnionTerritory'])
+grouped = data2.groupby(level = data2.index.names.difference(['State/UnionTerritory']), sort=False)
+grouped.sum()
+
+x = data["Date"].tolist()
+y = data["TotalConfirmed"].tolist()
+x=list(dict.fromkeys(x))
+data.set_index('Date')['TotalConfirmed'].plot(linewidth = 0.5, figsize = (15,3))
+plt.xlabel('date')
+plt.ylabel('total cases')
+
+##RATE OF INCREASE##
+roi=[]
+for i in range(34,len(y)-1):
+    z=(y[i+1]-y[i])/y[i]
+    roi.append(z)
+s=0 
+for i in range(len(roi)):
+    s=s+roi[i]
+ar=s/len(roi)
+print(ar)
+
+
+##PREDICTION##
+P_o=int(input("Enter the inital number of cases:"))
+t=int(input("Enter the period:"))
+P_t=round(P_o*(math.exp(ar*t)))
+print("Predicted cases:",P_t)
